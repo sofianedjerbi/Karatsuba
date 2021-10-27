@@ -16,9 +16,9 @@ void test_multiply(poly_u *(*multiply)(poly_u *, poly_u *),
                    uint32_t max_deg, uint32_t inc) {
     clock_t start, end;
     double time;
-    for (uint32_t d=0; d < max_deg; d+=inc){
+    for (uint32_t d=0; d <= max_deg; d+=inc){
         poly_u *p = alloc_poly_u(d);  // Polynome qu'on va mettre au carré
-        for (uint32_t i=0; i < d+1; i++) // Initialiser p
+        for (uint32_t i=0; i <= d; i++) // Initialiser p
             p->coef[i] = 1;
         start = clock();
         poly_u *k = (*multiply)(p, p); // On multiplie ici
