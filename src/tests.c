@@ -6,12 +6,12 @@
 #include "poly.h"
 #include "tests.h"
 
-/* Met au carré le polynome X^n + ... + 1
- * Itérativement de degré 1 jusqu'au degré max_deg
- * Synopsis: Mesurer les perfs d'une fonction de multiplication 
+/* Compute the square of the polynomial X^n + ... + 1
+ * From degree 1 to degree max_deg with incrementation inc
+ * Synopsis: Benchmarking 
  * Params: 
- *  - multiply: fonction de multiplication (pointeur) 
- *  - max_deg: Degré de fin du test */
+ *  - multiply: multiplycation func (pointer) 
+ *  - max_deg: maximum degree */
 void test_multiply(poly_u *(*multiply)(poly_u *, poly_u *), 
                    uint32_t max_deg, uint32_t inc) {
     clock_t start, end;
