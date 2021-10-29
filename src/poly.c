@@ -45,7 +45,7 @@ bool equal_poly_u(poly_u *p, poly_u *q) {
 
 /* Return the sum of two polynomials */
 poly_u *addpu(poly_u *p, poly_u *q) {
-    uint32_t deg = p->deg > q->deg ? p->deg : q->deg; // Take the maximum deg
+    uint32_t deg = p->deg < q->deg ? p->deg : q->deg; // Take the maximum deg
     poly_u *r = alloc_poly_u(deg); // result
     for(uint32_t i=0; i<=deg; i++)
         if (i > p->deg) // Avoid out of range error
@@ -157,7 +157,7 @@ poly_u *mulpukr(poly_u *p, poly_u *q) {
     return mulpukrt(p, q, DEG_THRESHOLD);
 }
 
-/* Recursive multiplication with custom threshold */
+/* Multiplication with iterative decomposition and custom threshold */
 poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     if (p->deg == 0)
         return cst_multiply(p->coef[0], q);
@@ -180,7 +180,7 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     poly_u *b = mulpukrt(ppp, qpq, deg_threshold); 
     poly_u *c = mulpukrt(p1, q1, deg_threshold);
     poly_u *cx = mulpx(2*n, c); // CX^2n
-    poly_u apc = addpu(a, c); // A+C
+    poly_u *apc = addpu(a, c); // A+C
     negp(apc);  // -(A+C)
     poly_u *bmapc = addpu(b, apc); // B - (A+C)
     poly_u *bmapcx = mulpx(n, bmapc); // *X^n, on appelle ca h pour simplifier
@@ -188,7 +188,7 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     poly_u *result = addpu(hpa, cx);  // +CX^2n
 
     // TIME TO FREE EVERYTHING..................
-    free_poly_u(a);
+    /*free_poly_u(a);
     free_poly_u(b);
     free_poly_u(c);
     free_poly_u(p0);
@@ -201,8 +201,7 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     free_poly_u(apc);
     free_poly_u(bmapc);
     free_poly_u(bmapcx);
-    free_poly_u(hpa);
-
+    free_poly_u(hpa);*/
     return result;
 }
 
