@@ -2,6 +2,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifndef DEG_THRESHOLD
+#define DEG_THRESHOLD 100000
+#endif
+
+
 // Represent a polynom of degree deg
 typedef struct poly_u {
     uint32_t *coef;  // Coef list
@@ -34,3 +39,10 @@ poly_u *mulpuk1(poly_u *, poly_u *);
 
 // Polynomial cut
 poly_u *cutpu(uint32_t, uint32_t, poly_u *);
+
+// Negates a polynomial
+void negp(poly_u *);
+
+// Recursive multiplication
+poly_u *mulpukrt(poly_u *, poly_u *, uint32_t);
+poly_u *mulpukr(poly_u *, poly_u *);

@@ -46,7 +46,7 @@ bool equal_poly_u(poly_u *p, poly_u *q) {
 /* Return the sum of two polynomials */
 poly_u *addpu(poly_u *p, poly_u *q) {
     uint32_t deg = p->deg > q->deg ? p->deg : q->deg; // Take the maximum deg
-    poly_u *r = alloc_poly_u(deg);// Result
+    poly_u *r = alloc_poly_u(deg); // result
     for(uint32_t i=0; i<=deg; i++)
         if (i > p->deg) // Avoid out of range error
             r->coef[i] = q->coef[i];
@@ -91,36 +91,47 @@ poly_u *mulpu(poly_u *p, poly_u *q) {
 
 }
 
+/* The opposite of a polynomial */
+void negp(poly_u *p) {    
+    for(uint32_t i=0; i<=p->deg; i++)
+        p->coef[i] = -p->coef[i];
+}
 
-poly_u *negp(poly_u *p) {
+poly_u *cst_multiply(uint32_t k, poly_u *p) {
     poly_u *r = alloc_poly_u(p->deg);
     for(uint32_t i=0; i<=p->deg; i++)
-        r->coef[i] = -p->coef[i];
+        r->coef[i] = k * p->coef[i];
     return r;
 }
+
 
 /* Polynomial product with PQ = (P1X^n + P0)(Q1X^n + Q0) */
 /* Non-recursive decomposition */
 poly_u *mulpuk1(poly_u *p, poly_u *q) {
+    if (p->deg == 0)
+        return cst_multiply(p->coef[0], q);
+    else if (q->deg == 0)
+        return cst_multiply(q->coef[0], p);
+
     // We cut each polynomial in half
     poly_u *p0 = cutpu(0, p->deg/2, p);
-    poly_u *p1 = cutpu(p->deg/2, p->deg, p);
+    poly_u *p1 = cutpu(p->deg/2+1, p->deg, p);
     poly_u *q0 = cutpu(0, q->deg/2, q);
-    poly_u *q1 = cutpu(q->deg/2, q->deg, q); 
+    poly_u *q1 = cutpu(q->deg/2+1, q->deg, q); 
     uint32_t n = p0->deg + 1;
     // We do every operation 1 per 1
     poly_u *a = mulpu(p0, q0);
-    poly_u *ppp = addpu(p0, p1);
-    poly_u *qpq = addpu(q0, q1);
-    poly_u *b = mulpu(ppp, qpq);
+    poly_u *ppp = addpu(p0, p1); // P0 + P1
+    poly_u *qpq = addpu(q0, q1); // Q0 + Q1
+    poly_u *b = mulpu(ppp, qpq); 
     poly_u *c = mulpu(p1, q1);
-    poly_u *cx = mulpx(2*n, c);
-    poly_u *apc = addpu(a, c);
-    polt_y *mapc = negp(a, c);
-    poly_u *bmapc = addpu(b, mapc); // B - (A+C)
-    poly_u *bmapcx = mulpx(n, bmapc); // On appelle ca h pour simplifier
-    poly_u *hpa = addpu(bmapcx, a);
-    poly_u *result = 
+    poly_u *cx = mulpx(2*n, c); // CX^2n
+    poly_u *apc = addpu(a, c); // A+C
+    negp(apc);  // -(A+C)
+    poly_u *bmapc = addpu(b, apc); // B - (A+C)
+    poly_u *bmapcx = mulpx(n, bmapc); // *X^n, on appelle ca h pour simplifier
+    poly_u *hpa = addpu(bmapcx, a); // +A
+    poly_u *result = addpu(hpa, cx);  // +CX^2n
 
     // TIME TO FREE EVERYTHING..................
     free_poly_u(a);
@@ -135,4 +146,64 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     free_poly_u(cx);
     free_poly_u(apc);
     free_poly_u(bmapc);
+    free_poly_u(bmapcx);
+    free_poly_u(hpa);
+
+    return result;
 }
+
+/* Wrapper for mulpkrt */
+poly_u *mulpukr(poly_u *p, poly_u *q) {
+    return mulpukrt(p, q, DEG_THRESHOLD);
+}
+
+/* Recursive multiplication with custom threshold */
+poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
+    if (p->deg == 0)
+        return cst_multiply(p->coef[0], q);
+    else if (q->deg == 0)
+        return cst_multiply(q->coef[0], p);
+    if (p->deg + q->deg < deg_threshold)
+       mulpu(p, q);
+
+    // We cut each polynomial in half
+    poly_u *p0 = cutpu(0, p->deg/2, p);
+    poly_u *p1 = cutpu(p->deg/2+1, p->deg, p);
+    poly_u *q0 = cutpu(0, q->deg/2, q);
+    poly_u *q1 = cutpu(q->deg/2+1, q->deg, q); 
+    uint32_t n = p0->deg + 1;
+
+    // We do every operation 1 per 1
+    poly_u *a = mulpukrt(p0, q0, deg_threshold);
+    poly_u *ppp = addpu(p0, p1); // P0 + P1
+    poly_u *qpq = addpu(q0, q1); // Q0 + Q1
+    poly_u *b = mulpukrt(ppp, qpq, deg_threshold); 
+    poly_u *c = mulpukrt(p1, q1, deg_threshold);
+    poly_u *cx = mulpx(2*n, c); // CX^2n
+    poly_u apc = addpu(a, c); // A+C
+    negp(apc);  // -(A+C)
+    poly_u *bmapc = addpu(b, apc); // B - (A+C)
+    poly_u *bmapcx = mulpx(n, bmapc); // *X^n, on appelle ca h pour simplifier
+    poly_u *hpa = addpu(bmapcx, a); // +A
+    poly_u *result = addpu(hpa, cx);  // +CX^2n
+
+    // TIME TO FREE EVERYTHING..................
+    free_poly_u(a);
+    free_poly_u(b);
+    free_poly_u(c);
+    free_poly_u(p0);
+    free_poly_u(q0);
+    free_poly_u(p1);
+    free_poly_u(q1);
+    free_poly_u(ppp);
+    free_poly_u(qpq);
+    free_poly_u(cx);
+    free_poly_u(apc);
+    free_poly_u(bmapc);
+    free_poly_u(bmapcx);
+    free_poly_u(hpa);
+
+    return result;
+}
+
+
