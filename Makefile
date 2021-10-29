@@ -19,4 +19,4 @@ run: all
 
 clean:
 	rm -f src/*.o
-	rm ./$(EXEC)
+	[ ! -e $(EXEC) ] || rm ./$(EXEC)
