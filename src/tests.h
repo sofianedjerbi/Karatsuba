@@ -7,3 +7,4 @@
 void test_multiply(poly_u *(multiply)(poly_u *, poly_u *),
                    uint32_t, uint32_t);
 
+void compare_multiply(poly_u *(multiply)(poly_u *, poly_u *));

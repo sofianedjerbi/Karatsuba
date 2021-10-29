@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -17,16 +18,38 @@ void test_multiply(poly_u *(*multiply)(poly_u *, poly_u *),
     clock_t start, end;
     double time;
     for (uint32_t d=0; d <= max_deg; d+=inc){
-        poly_u *p = alloc_poly_u(d);  // Polynome qu'on va mettre au carré
-        for (uint32_t i=0; i <= d; i++) // Initialiser p
+        poly_u *p = alloc_poly_u(d);  // Squared polynomial
+        for (uint32_t i=0; i <= d; i++) // Init p
             p->coef[i] = 1;
         start = clock();
-        poly_u *k = (*multiply)(p, p); // On multiplie ici
+        poly_u *k = (*multiply)(p, p); // We multiply here
         end = clock();
         time = ((double)(end-start))/CLOCKS_PER_SEC;
         printf("Time for degree %d: %lf\n", d, time);
         free_poly_u(p);
+        free_poly_u(k);
     }
 }
 
-
+/* Compute the square of the polynomial nX^n + ... + 0
+ * From degree 1 to degree 1000 and compare with mulpu. 
+ * Synopsis: Check if the multiplication operation is correct 
+ * Params: 
+ *  - multiply: multiplycation func (pointer) */
+void compare_multiply(poly_u *(*multiply)(poly_u *, poly_u *)) {
+    for (uint32_t d=0; d <= 1000; d+=1){
+        poly_u *p = alloc_poly_u(d);  // Squared polynomial
+        
+        for (uint32_t i=0; i <= d; i++) // Initialize p
+            p->coef[i] = 1;
+        
+        poly_u *k = (*multiply)(p, p); // We multiply here
+        poly_u *l = mulpu(p, p);
+        if (!equal_poly_u(k, l))
+            printf("!!"); // Error
+        free_poly_u(p);
+        free_poly_u(k);
+        free_poly_u(l);
+    }
+    printf("ok\n");
+}
