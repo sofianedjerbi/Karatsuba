@@ -37,7 +37,8 @@ void test_multiply(poly_u *(*multiply)(poly_u *, poly_u *),
  * Params: 
  *  - multiply: multiplycation func (pointer) */
 void compare_multiply(poly_u *(*multiply)(poly_u *, poly_u *)) {
-    for (uint32_t d=0; d <= 1000; d+=1){
+    printf("beginning test\n");
+    for (uint32_t d=0; d <= 10; d++){
         poly_u *p = alloc_poly_u(d);  // Squared polynomial
         
         for (uint32_t i=0; i <= d; i++) // Initialize p
@@ -45,11 +46,18 @@ void compare_multiply(poly_u *(*multiply)(poly_u *, poly_u *)) {
         
         poly_u *k = (*multiply)(p, p); // We multiply here
         poly_u *l = mulpu(p, p);
-        if (!equal_poly_u(k, l))
-            printf("!!"); // Error
-        free_poly_u(p);
-        free_poly_u(k);
-        free_poly_u(l);
+        if (!equal_poly_u(k, l)){
+            printf("ERROR\n");
+            printf("polynomial p:  ");
+            print_poly_u(p);
+            printf("p^2 mulpu:     "); // Error
+            print_poly_u(l);
+            printf("p^2 result:    ");
+            print_poly_u(k);
+        }
+        /* free_poly_u(p); */
+        /* free_poly_u(k); */
+        /* free_poly_u(l); */
     }
-    printf("ok\n");
+    printf("end test\n");
 }
