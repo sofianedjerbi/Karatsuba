@@ -20,13 +20,15 @@ int main(int argc, char **argv) {
         print_options();
     else if (strcmp(argv[1], "-n") == 0)  // mulpu
         test_multiply(mulpu, 500000, 100000);
-    else if (strcmp(argv[1], "-k") == 0) // mulpuk1
+    else if (strcmp(argv[1], "-k") == 0)  // mulpuk1
         test_multiply(mulpukr, 500000, 100000);
     else if (strcmp(argv[1], "-k1") == 0) // mulpuk1
         test_multiply(mulpuk1, 500000, 100000);
     else if (strcmp(argv[1], "-t") == 0){ // Tests
+        printf("mulpuk1 test\n");
         compare_multiply(mulpuk1); // Make sure that mulpuk1 works
-        //compare_multiply(mulpukr);
+        printf("\nmulpukrt test\n");
+        //compare_multiply(mulpukr); // mulpukr
     }
     else
         print_options();

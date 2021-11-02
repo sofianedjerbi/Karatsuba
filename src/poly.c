@@ -30,15 +30,12 @@ void free_poly_u(poly_u *p) {
         free(p);
 }
 
-/* Return true if p and q are the same (:= same coefs) */
+/* Return true if p and q are the same (:= same coefs and degree) */
 bool equal_poly_u(poly_u *p, poly_u *q) {
-    uint32_t deg = MAX(p->deg, q->deg); // Take the maximum deg
-    for(uint32_t i=0; i < deg; i++)  // We compare each coef
-        if (i > p->deg && q->coef[i] != 0) // Avoid out of range
-            return false;
-        else if (i > q->deg && p->coef[i] != 0) // Avoid out of range
-            return false;
-        else if (p->coef[i] != q->coef[i]) // If they're not the same
+    if (p->deg != q->deg)
+        return false;
+    for(uint32_t i=0; i <= p->deg; i++)  // We compare each coef
+        if (p->coef[i] != q->coef[i]) // If they're not the same
             return false;
     return true;
 }
@@ -90,6 +87,18 @@ poly_u *mulpu(poly_u *p, poly_u *q) {
 
 }
 
+/* Substraction of two polynomials */
+void subpu(poly_u *p, poly_u *q, poly_u *r) {
+    uint32_t deg = MAX(p->deg, q->deg);
+    for(uint32_t i=0; i<=deg; i++)
+        if (i > p->deg) // Avoid out of range error
+            r->coef[i] = q->coef[i];
+        else if (i > q->deg)  // Same
+            r->coef[i] = p->coef[i];
+        else // Return the sum at degree i
+            r->coef[i] = p->coef[i] + q->coef[i];
+}
+
 /* The opposite of a polynomial */
 void negp(poly_u *p) {    
     for(uint32_t i=0; i<=p->deg; i++)
@@ -136,25 +145,26 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     addpu(&q0, &q1, &qpq); // Q0 + Q1
 
     poly_u *a = mulpu(&p0, &q0);
+    print_poly_u(a);
     poly_u *c = mulpu(&p1, &q1);
+    print_poly_u(c);
     poly_u *b = mulpu(&ppp, &qpq); 
-
+    print_poly_u(b);
+    
     // Placeholder for additions
     uint32_t deg = MAX(MAX(a->deg, c->deg), b->deg); // Max(a,b,c)
     poly_u *r = alloc_poly_u(p->deg + q->deg);
     r->deg = deg;
 
-    addpu(a, c, r);   // T = A+C
-    negp(r);          // T = -A-C
-    addpu(b, r, r);   // T = B - (A+C)
-    mulpx(n, r, false);      // T = (B-(A+C))*X^n
-    addpu(a, r, r);   // T = (B-(A+C))*X^n + A
-    mulpx(2*n, c, true);    // C = CX^2n
+    addpu(a, c, r);      // T = A+C
+    negp(r);             // T = -A-C
+    addpu(b, r, r);      // T = B - (A+C)
+    mulpx(n, r, false);  // T = (B-(A+C))*X^n
+    addpu(a, r, r);      // T = (B-(A+C))*X^n + A
+    mulpx(2*n, c, true); // C = CX^2n
     // Defining degree and adding result
-    
     r->deg = p->deg + q->deg;
-    
-    addpu(c, r, r);   // R = (B-(A+C))*X^n + A + CX^2n
+    addpu(c, r, r);      // R = (B-(A+C))*X^n + A + CX^2n
 
     // free everything
     free_poly_u(a);
@@ -204,24 +214,26 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     addpu(&q0, &q1, &qpq); // Q0 + Q1
 
     poly_u *a = mulpukrt(&p0, &q0, deg_threshold);
+    print_poly_u(a);
     poly_u *c = mulpukrt(&p1, &q1, deg_threshold);
+    print_poly_u(c);
     poly_u *b = mulpukrt(&ppp, &qpq, deg_threshold); 
+    print_poly_u(b);
 
     // Placeholder for additions
     uint32_t deg = MAX(MAX(a->deg, c->deg), b->deg); // Max(a,b,c)
     poly_u *r = alloc_poly_u(p->deg + q->deg);
     r->deg = deg;
-    addpu(a, c, r);   // T = A+C
-    negp(r);          // T = -A-C
-    addpu(b, r, r);   // T = B - (A+C)
-    mulpx(n, r, false);      // T = (B-(A+C))*X^n
-    addpu(a, r, r);   // T = (B-(A+C))*X^n + A
-    mulpx(2*n, c, true);    // C = CX^2n
+    addpu(a, c, r);      // T = A+C
+    negp(r);             // T = -A-C
+    addpu(b, r, r);      // T = B - (A+C)
+    mulpx(n, r, false);  // T = (B-(A+C))*X^n
+    addpu(a, r, r);      // T = (B-(A+C))*X^n + A
+    mulpx(2*n, c, true); // C = CX^2n
     // Defining degree and adding result
-    
     r->deg = p->deg + q->deg;
-    addpu(c, r, r);   // R = (B-(A+C))*X^n + A + CX^2n
-
+    addpu(c, r, r);      // R = (B-(A+C))*X^n + A + CX^2n
+    
     // free everything
     free_poly_u(a);
     free_poly_u(b);
