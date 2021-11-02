@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
         test_multiply(mulpuk1, 500000, 100000);
     else if (strcmp(argv[1], "-t") == 0){ // Tests
         compare_multiply(mulpuk1); // Make sure that mulpuk1 works
-        compare_multiply(mulpukr);
+        //compare_multiply(mulpukr);
     }
     else
         print_options();
