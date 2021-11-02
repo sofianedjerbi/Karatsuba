@@ -29,7 +29,7 @@ void free_poly_u(poly_u *);
 poly_u *mulpu(poly_u *, poly_u *);
 
 // P*X^n multiplication
-void mulpx(uint32_t, poly_u *);
+void mulpx(uint32_t, poly_u *, bool);
 
 // Add two polynomials
 void addpu(poly_u *, poly_u *, poly_u *);

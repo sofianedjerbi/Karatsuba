@@ -15,8 +15,8 @@ void print_poly_u(poly_u *p) {
 
 /* Allocate a polynomial of degree deg */
 poly_u *alloc_poly_u(uint32_t deg) {
-    uint32_t *c = calloc(deg, sizeof(uint32_t)*(deg+1)); // X**deg != null
-    poly_u *p = malloc(sizeof(uint32_t));
+    uint32_t *c = malloc(sizeof(uint32_t)*(deg+1)); // X**deg != null
+    poly_u *p = malloc(sizeof(poly_u));
     p->coef = c;
     p->deg = deg;
     return p;
@@ -56,9 +56,10 @@ void addpu(poly_u *p, poly_u *q, poly_u *r) {
 }
 
 /* Multiply a polynomial by X^n (simplifying computings) */
-void mulpx(uint32_t n, poly_u *p) {
+void mulpx(uint32_t n, poly_u *p, bool rea) {
     // Realloc more memory to handle all the coefficients
-    p->coef = realloc(p->coef, sizeof(uint32_t) * (p->deg + n)); 
+    if (rea)
+        p->coef = realloc(p->coef, sizeof(uint32_t) * (p->deg + n + 1)); 
     // Left shift by n
     for(int64_t i=p->deg; i >= 0; i--){
         p->coef[i+n] = p->coef[i];
@@ -133,7 +134,7 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     // We do every operation 1 per 1
     addpu(&p0, &p1, &ppp); // P0 + P1
     addpu(&q0, &q1, &qpq); // Q0 + Q1
-    
+
     poly_u *a = mulpu(&p0, &q0);
     poly_u *c = mulpu(&p1, &q1);
     poly_u *b = mulpu(&ppp, &qpq); 
@@ -146,12 +147,13 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     addpu(a, c, r);   // T = A+C
     negp(r);          // T = -A-C
     addpu(b, r, r);   // T = B - (A+C)
-    mulpx(n, r);      // T = (B-(A+C))*X^n
+    mulpx(n, r, false);      // T = (B-(A+C))*X^n
     addpu(a, r, r);   // T = (B-(A+C))*X^n + A
-    mulpx(2*n, c);    // C = CX^2n
+    mulpx(2*n, c, true);    // C = CX^2n
     // Defining degree and adding result
     
     r->deg = p->deg + q->deg;
+    
     addpu(c, r, r);   // R = (B-(A+C))*X^n + A + CX^2n
 
     // free everything
@@ -212,9 +214,9 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     addpu(a, c, r);   // T = A+C
     negp(r);          // T = -A-C
     addpu(b, r, r);   // T = B - (A+C)
-    mulpx(n, r);      // T = (B-(A+C))*X^n
+    mulpx(n, r, false);      // T = (B-(A+C))*X^n
     addpu(a, r, r);   // T = (B-(A+C))*X^n + A
-    mulpx(2*n, c);    // C = CX^2n
+    mulpx(2*n, c, true);    // C = CX^2n
     // Defining degree and adding result
     
     r->deg = p->deg + q->deg;
