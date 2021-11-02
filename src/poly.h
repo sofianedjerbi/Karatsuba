@@ -2,8 +2,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 #ifndef DEG_THRESHOLD
-#define DEG_THRESHOLD 100000
+#define DEG_THRESHOLD 100
 #endif
 
 
@@ -26,10 +29,10 @@ void free_poly_u(poly_u *);
 poly_u *mulpu(poly_u *, poly_u *);
 
 // P*X^n multiplication
-poly_u *mulpx(uint32_t, poly_u *);
+void mulpx(uint32_t, poly_u *);
 
 // Add two polynomials
-poly_u *addpu(poly_u *, poly_u *);
+void addpu(poly_u *, poly_u *, poly_u *);
 
 // Polynomial equality
 bool equal_poly_u(poly_u *, poly_u *);
@@ -38,7 +41,7 @@ bool equal_poly_u(poly_u *, poly_u *);
 poly_u *mulpuk1(poly_u *, poly_u *);
 
 // Polynomial cut
-poly_u *cutpu(uint32_t, uint32_t, poly_u *);
+void cutpu(uint32_t, uint32_t, poly_u *, poly_u *);
 
 // Negates a polynomial
 void negp(poly_u *);
