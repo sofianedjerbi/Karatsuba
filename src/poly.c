@@ -22,6 +22,12 @@ poly_u *alloc_poly_u(uint32_t deg) {
     return p;
 }
 
+/* Init the polynomial to 0 */
+void init(poly_u *p) {
+    for(uint32_t i=0; i<=p->deg; i++)
+        p->coef[i] = 0;
+}
+
 /* Free a polynomial p */
 void free_poly_u(poly_u *p) {
     if(p->coef != NULL) // Null may be non portable
@@ -58,10 +64,11 @@ void mulpx(uint32_t n, poly_u *p, bool rea) {
     if (rea)
         p->coef = realloc(p->coef, sizeof(uint32_t) * (p->deg + n + 1)); 
     // Left shift by n
-    for(int64_t i=p->deg; i >= 0; i--){
+    for(int64_t i=p->deg; i >= 0; i--)
         p->coef[i+n] = p->coef[i];
+    // Init realloc values
+    for(int64_t i=0; i < n; i++)
         p->coef[i] = 0;
-    }
     p->deg += n; // Change degree
 }
 
@@ -145,15 +152,16 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     addpu(&q0, &q1, &qpq); // Q0 + Q1
 
     poly_u *a = mulpu(&p0, &q0);
-    print_poly_u(a);
+    //print_poly_u(a);
     poly_u *c = mulpu(&p1, &q1);
-    print_poly_u(c);
+    //print_poly_u(c);
     poly_u *b = mulpu(&ppp, &qpq); 
-    print_poly_u(b);
+    //print_poly_u(b);
     
     // Placeholder for additions
     uint32_t deg = MAX(MAX(a->deg, c->deg), b->deg); // Max(a,b,c)
     poly_u *r = alloc_poly_u(p->deg + q->deg);
+    init(r);
     r->deg = deg;
 
     addpu(a, c, r);      // T = A+C
@@ -214,11 +222,11 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     addpu(&q0, &q1, &qpq); // Q0 + Q1
 
     poly_u *a = mulpukrt(&p0, &q0, deg_threshold);
-    print_poly_u(a);
+    //print_poly_u(a);
     poly_u *c = mulpukrt(&p1, &q1, deg_threshold);
-    print_poly_u(c);
+    //print_poly_u(c);
     poly_u *b = mulpukrt(&ppp, &qpq, deg_threshold); 
-    print_poly_u(b);
+    //print_poly_u(b);
 
     // Placeholder for additions
     uint32_t deg = MAX(MAX(a->deg, c->deg), b->deg); // Max(a,b,c)
