@@ -1,8 +1,12 @@
 # Karatsuba
 Studying polynomial multiplication
-![](performances.png)
-## How to run
-Install dependencies `pip install -r requirements.txt`  
-With the wrapper `python wrapper.py`.  
-With make: `make`.  
-Command list: `./out`
+<div align="center">
+<img src="performances.png"/>
+</div>
+## Compile/Run
+### With the wrapper
+Install dependencies: `pip install -r requirements.txt`  
+And run with `python wrapper.py`.  
+### With make
+Compile with `make`.  
+Command list: `./out`.
