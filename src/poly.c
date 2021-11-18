@@ -142,8 +142,8 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     // local coefs on the stack
     ppp.deg = MAX(p0.deg, p1.deg);
     qpq.deg = MAX(q0.deg, q1.deg);
-    uint32_t pp[ppp.deg]; 
-    uint32_t qq[qpq.deg];
+    uint32_t pp[ppp.deg + 1]; 
+    uint32_t qq[qpq.deg + 1];
     ppp.coef = pp;
     qpq.coef = qq;
 
@@ -152,11 +152,8 @@ poly_u *mulpuk1(poly_u *p, poly_u *q) {
     addpu(&q0, &q1, &qpq); // Q0 + Q1
 
     poly_u *a = mulpu(&p0, &q0);
-    //print_poly_u(a);
     poly_u *c = mulpu(&p1, &q1);
-    //print_poly_u(c);
     poly_u *b = mulpu(&ppp, &qpq); 
-    //print_poly_u(b);
     
     // Placeholder for additions
     uint32_t deg = MAX(MAX(a->deg, c->deg), b->deg); // Max(a,b,c)
@@ -212,8 +209,8 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     // local coefs on the stack
     ppp.deg = MAX(p0.deg, p1.deg);
     qpq.deg = MAX(q0.deg, q1.deg);
-    uint32_t pp[ppp.deg]; 
-    uint32_t qq[qpq.deg];
+    uint32_t pp[ppp.deg + 1]; 
+    uint32_t qq[qpq.deg + 1];
     ppp.coef = pp;
     qpq.coef = qq;
 
@@ -222,16 +219,15 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     addpu(&q0, &q1, &qpq); // Q0 + Q1
 
     poly_u *a = mulpukrt(&p0, &q0, deg_threshold);
-    //print_poly_u(a);
     poly_u *c = mulpukrt(&p1, &q1, deg_threshold);
-    //print_poly_u(c);
     poly_u *b = mulpukrt(&ppp, &qpq, deg_threshold); 
-    //print_poly_u(b);
-
+    
     // Placeholder for additions
     uint32_t deg = MAX(MAX(a->deg, c->deg), b->deg); // Max(a,b,c)
     poly_u *r = alloc_poly_u(p->deg + q->deg);
+    init(r);
     r->deg = deg;
+
     addpu(a, c, r);      // T = A+C
     negp(r);             // T = -A-C
     addpu(b, r, r);      // T = B - (A+C)
@@ -241,12 +237,13 @@ poly_u *mulpukrt(poly_u *p, poly_u *q, uint32_t deg_threshold) {
     // Defining degree and adding result
     r->deg = p->deg + q->deg;
     addpu(c, r, r);      // R = (B-(A+C))*X^n + A + CX^2n
-    
+
     // free everything
     free_poly_u(a);
     free_poly_u(b);
     free_poly_u(c);
     
+    return r;
     return r;
 }
 

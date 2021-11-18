@@ -6,7 +6,7 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 #ifndef DEG_THRESHOLD
-#define DEG_THRESHOLD 100
+#define DEG_THRESHOLD 1000
 #endif
 
 
