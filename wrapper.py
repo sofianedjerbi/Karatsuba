@@ -34,8 +34,8 @@ if __name__ == "__main__":
     
     print("Plotting performances...")
     for option in [("-n", "Naive (mulpu)", "r"),
-            ("-k1",  "Decomposition (mulpuk1)", "b")]:
-                   #("-k", "Recursive", "g")]:
+                   ("-k1",  "Decomposition (mulpuk1)", "b"),
+                   ("-k", "Recursive", "g")]:
         print(f"Plotting \"{option[1]}\"...")
         plot_performances(*option)
 
