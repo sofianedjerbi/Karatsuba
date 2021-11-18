@@ -15,7 +15,7 @@ def plot_performances(option, name, color):
         print(line)
         data = line.split()
         # Getting x and y values
-        x = int(data[-2][:-1])
+        x = int(data[-2][:-1])/1000
         y = float(data[-1])
         xi.append(x)
         yi.append(y)
@@ -33,14 +33,14 @@ if __name__ == "__main__":
     subprocess.call("make")
     
     print("Plotting performances...")
-    for option in [("-n", "Naive multiplication $O{x^2}$", "r"),
-                   ("-k1","Multiplication with decomposition $O{x^2}$", "b"),
-                   ("-k", "Recursive karatsuba $O(x^{log_2(3)}$", "g")]:
+    for option in [("-n", "Naive multiplication $\O(x^2)$", "r"),
+                   ("-k1","Multiplication with decomposition $\O(x^2)$", "b"),
+                   ("-k", "Recursive karatsuba $\O(x^{\log_2(3)})$", "g")]:
         print(f"Plotting \"{option[1]}\"...")
         plot_performances(*option)
 
     plt.ylabel("Runtime")
-    plt.xlabel("Degree")
+    plt.xlabel("Degree/1000")
     plt.legend(loc="best")
     plt.savefig("performances.png")
     print("Done.")
