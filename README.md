@@ -3,6 +3,8 @@ Studying polynomial multiplication
 <div align="center">
 <img src="performances.png"/>
 </div>
+
+
 ## Compile/Run
 ### With the wrapper
 Install dependencies: `pip install -r requirements.txt`  
