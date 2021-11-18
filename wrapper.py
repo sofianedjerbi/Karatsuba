@@ -33,9 +33,9 @@ if __name__ == "__main__":
     subprocess.call("make")
     
     print("Plotting performances...")
-    for option in [("-n", "Naive multiplication $\O(x^2)$", "r"),
-                   ("-k1","Multiplication with decomposition $\O(x^2)$", "b"),
-                   ("-k", "Recursive karatsuba $\O(x^{\log_2(3)})$", "g")]:
+    for option in [("-n", "Naive multiplication $O(x^2)$", "r"),
+                   ("-k1","Multiplication with decomposition $O(x^2)$", "b"),
+                   ("-k", "Recursive karatsuba $O(x^{\log_2(3)})$", "g")]:
         print(f"Plotting \"{option[1]}\"...")
         plot_performances(*option)
 
