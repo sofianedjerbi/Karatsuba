@@ -38,7 +38,7 @@ void test_multiply(poly_u *(*multiply)(poly_u *, poly_u *),
  *  - multiply: multiplycation func (pointer) */
 void compare_multiply(poly_u *(*multiply)(poly_u *, poly_u *)) {
     printf("beginning test\n");
-    for (uint32_t d=0; d <= 10; d++){
+    for (uint32_t d=0; d <= 1000; d++){
         poly_u *p = alloc_poly_u(d);  // Squared polynomial
         
         for (uint32_t i=0; i <= d; i++) // Initialize p
